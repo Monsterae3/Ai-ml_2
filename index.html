@@ -2,111 +2,97 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="external.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatGPT Clone</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f3eada; /* light beige */
-            margin: 0;
-            overflow: hidden;
-        }
-        .chat-container {
-            width: 400px;
-            height: 600px;
-            background: #fff7e8; /* soft peach color */
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        .chat-box {
-            flex: 1;
-            padding: 10px;
-            overflow-y: auto;
-            color: black;
-        }
-        .input-container {
-            display: flex;
-            padding: 10px;
-            background: #F5F5DC; /* beige */
-        }
-        input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #FFB347; /* light orange border */
-            border-radius: 5px;
-            outline: none;
-        }
-        button {
-            background: #FFB347; /* light orange */
-            border: none;
-            color: rgb(255, 255, 255);
-            padding: 10px 15px;
-            margin-left: 5px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #f6973e; /* slightly darker orange */
-        }
-        .expand-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background-color: #B8E986; /* lime green */
-            border: none;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .expanded .chat-container {
-            width: 100vw;
-            height: 100vh;
-            border-radius: 0;
-        }
-        .expanded .input-container {
-            display: none;
-        }
+        
     </style>
 </head>
 <body>
-    <div class="expanded" id="chatWrapper">
-        <button class="expand-button" onclick="expandChat()">Expand</button>
-        <div class="chat-container">
-            <div class="chat-box" id="chatBox">
-            </div>
-            <div class="input-container">
-                <input type="text" id="userInput" placeholder="Type a message...">
-                <button onclick="sendMessage()">Send</button>
-            </div>
+    <div class="chat-container" id="chatWrapper">
+        
+        <!-- Question Boxes -->
+        <div class="question-boxes">
+            <div class="question" onclick="sendQuickQuestion('What\'s for dinner?')">What's for dinner?</div>
+            <div class="question" onclick="sendQuickQuestion('What are some foods with rice?')">What are some foods with rice?</div>
+            <div class="question" onclick="sendQuickQuestion('Suggest a healthy meal.')">Suggest a healthy meal.</div>
+        </div>
+
+        <div class="chat-box" id="chatBox"></div>
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Type a message...">
+            <button id="send-btn" onclick="sendMessage()">Send</button>
         </div>
     </div>
 
+     <!-- Sidebar -->
+     <div class="sidebar" id="sidebar">
+        <a href="#">🏠 Home</a>
+        <a href="#">🍽 Food</a>
+        <a href="#">📜 History</a>
+        <a href="#">📞 Contact</a>
+    </div>
+
+    <!-- Toggle Button -->
+    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+
     <script>
+        // When a message is sent
+        document.getElementById("send-btn").addEventListener("click", sendMessage);
+        document.getElementById("user-input").addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+
         function sendMessage() {
-            var userInput = document.getElementById('userInput').value;
-            var chatBox = document.getElementById('chatBox');
-            if (userInput.trim()) {
-                var message = document.createElement('div');
-                message.textContent = userInput;
-                chatBox.appendChild(message);
-                document.getElementById('userInput').value = '';
-                chatBox.scrollTop = chatBox.scrollHeight;
+            const userInput = document.getElementById("user-input").value.trim();
+            const chatBox = document.getElementById("chatBox");
+            const chatWrapper = document.getElementById("chatWrapper");
+
+            if (userInput) {
+                appendMessage(userInput, "user");
+                document.getElementById("user-input").value = '';
+
+                // Expand chat area automatically when a message is sent
+                chatWrapper.classList.add("expanded");
+
+                // Simulate bot response
+                setTimeout(() => {
+                    appendMessage("I'm just a bot, but you said: " + userInput, "bot");
+                }, 1000);
             }
         }
 
-        function expandChat() {
-            var chatWrapper = document.getElementById('chatWrapper');
-            chatWrapper.classList.toggle('expanded');
+        function appendMessage(message, sender) {
+            const chatBox = document.getElementById("chatBox");
+            const messageDiv = document.createElement("div");
+
+            messageDiv.classList.add("message", sender === "user" ? "user-message" : "bot-message");
+            messageDiv.textContent = message;
+
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Check if chat should shrink or expand
+            checkChatSize();
+        }
+
+        function checkChatSize() {
+            const chatWrapper = document.getElementById("chatWrapper");
+            const chatBox = document.getElementById("chatBox");
+
+            // Shrink the chat if there are no messages
+            if (chatBox.children.length === 0) {
+                chatWrapper.classList.remove("expanded");
+            }
+        }
+
+        function sendQuickQuestion(question) {
+            document.getElementById('user-input').value = question;
+            sendMessage();
         }
     </script>
 </body>
 </html>
-
