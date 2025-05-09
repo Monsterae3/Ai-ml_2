@@ -1,16 +1,15 @@
-<!DOCTYPE html>
+ <!DOCTYPE html> 
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Foodie Chat</title>
 
-  <!-- Botpress -->
-  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-  <script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"></script>
-
-  <!-- Fonts (Optional but clean) -->
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- Botpress Webchat -->
+  <script src="https://cdn.botpress.cloud/webchat/v2.4/inject.js"></script>
 
   <style>
     * {
@@ -41,13 +40,23 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
 
-    #botpress-webchat iframe {
+    #webchat {
       width: 100%;
       height: 100%;
-      border: none;
     }
 
-    /* Sidebar */
+    #webchat .bpWebchat {
+      position: unset;
+      width: 100%;
+      height: 100%;
+      max-height: 100%;
+      max-width: 100%;
+    }
+
+    #webchat .bpFab {
+      display: none;
+    }
+
     .sidebar {
       position: fixed;
       top: 0;
@@ -76,7 +85,6 @@
       background-color: #444;
     }
 
-    /* Toggle Button */
     .toggle-btn {
       position: fixed;
       top: 15px;
@@ -116,60 +124,46 @@
   <!-- Toggle Sidebar Button -->
   <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
 
-  <!-- Chatbot -->
+  <!-- Chatbot Container -->
   <div class="chat-wrapper">
-    <div id="botpress-webchat"></div>
+    <div id="webchat"></div>
   </div>
 
-
-<script>
-  function toggleSidebar() {
-    document.getElementById("sidebar").classList.toggle("active");
-  }
-
-  window.botpressWebChat.init({
-    botId: "klempu5f",
-    clientId: "klempu5f",
-    hostUrl: "https://cdn.botpress.cloud/webchat/v2.2",
-    messagingUrl: "https://messaging.botpress.cloud",
-    container: "#botpress-webchat",
-    composerPlaceholder: "Send a message...",
-    hideWidget: true, // Important: disables the floating bubble
-    showPoweredBy: false,
-    enableTranscriptDownload: false,
-    layoutWidth: "100%",
-    theme: {
-      colors: {
-        primary: "#333",
-        secondary: "#f5f6fa",
-        textPrimary: "#ffffff",
-        textSecondary: "#333"
-      }
-    },
-    botConversationDescription: "Ask me anything food-related!",
-    enableConversationDeletion: true,
-    enableReset: true,
-    onLoad: function () {
-      setTimeout(() => {
-        window.botpressWebChat.sendEvent({
-          type: "proactive-trigger",
-          channel: "web",
-          payload: {
-            type: "quick_replies",
-            text: "Here are some tasty ideas to try:",
-            replies: [
-              { title: "What’s for dinner?", payload: "What’s for dinner?" },
-              { title: "Give me a healthy snack idea", payload: "Give me a healthy snack idea" },
-              { title: "What can I cook with eggs and rice?", payload: "What can I cook with eggs and rice?" }
-            ]
-          }
-        });
-      }, 1000); // wait for iframe to load
+  <!-- JS Scripts -->
+  <script>
+    function toggleSidebar() {
+      document.getElementById("sidebar").classList.toggle("active");
     }
-  });
-</script>
 
+    window.botpress.on("webchat:ready", () => {
+      window.botpress.sendPayload({
+        type: "quick_replies",
+        text: "Here are some tasty ideas to try:",
+        replies: [
+          { title: "What’s for dinner?", payload: "What’s for dinner?" },
+          { title: "Give me a healthy snack idea", payload: "Give me a healthy snack idea" },
+          { title: "What can I cook with eggs and rice?", payload: "What can I cook with eggs and rice?" }
+        ]
+      });
 
+      window.botpress.open();
+    });
+
+    window.botpress.init({
+      botId: "be20d1c7-fa5b-4fe4-9eeb-649a325f6b96",
+      clientId: "8b8e428c-ce1f-4989-a4b8-511857720649",
+      hostUrl: "https://cdn.botpress.cloud/webchat/v2.4",
+      messagingUrl: "https://messaging.botpress.cloud",
+      selector: "#webchat",
+      themeName: "prism",
+      themeMode: "light",
+      botName: "Foodie Bot",
+      composerPlaceholder: "Send a message...",
+      showPoweredBy: false,
+      enableConversationDeletion: true,
+      enableReset: true
+    });
   </script>
+
 </body>
-</html>
+</html
