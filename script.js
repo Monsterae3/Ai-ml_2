@@ -1,4 +1,4 @@
-const { createUser } = require('./createuser');
+/*const { createUser } = require('./createuser');
 const { createConversation } = require('./createconversation');
 const { sendMessage } = require('./sendmessage');
 
@@ -12,3 +12,4 @@ const { sendMessage } = require('./sendmessage');
     console.error("❌ Error:", error);
   }
 })();
+*/
