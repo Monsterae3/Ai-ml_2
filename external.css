@@ -154,10 +154,10 @@ button:hover {
     border-radius: 10px;
 }
 
-           body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
+body {
+font-family: Arial, sans-serif;
+display: flex;
+justify-content: center;
             align-items: center;
             height: 100vh;
             background-color: #f3eada; /* light beige */

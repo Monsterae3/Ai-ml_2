@@ -1,158 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChatGPT Clone</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f3eada; /* light beige */
-            margin: 0;
-            overflow: hidden;
-        }
-        .chat-container {
-            width: 400px;
-            height: 600px;
-            background: #fff7e8; /* soft peach color */
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        .chat-box {
-            flex: 1;
-            padding: 10px;
-            overflow-y: auto;
-            color: black;
-        }
-        .input-container {
-            display: flex;
-            padding: 10px;
-            background: #F5F5DC; /* beige */
-        }
-        input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #FFB347; /* light orange border */
-            border-radius: 5px;
-            outline: none;
-        }
-        button {
-            background: #FFB347; /* light orange */
-            border: none;
-            color: rgb(255, 255, 255);
-            padding: 10px 15px;
-            margin-left: 5px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #f6973e; /* slightly darker orange */
-        }
-        .expand-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background-color: #B8E986; /* lime green */
-            border: none;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .expanded .chat-container {
-            width: 100vw;
-            height: 100vh;
-            border-radius: 0;
-        }
-        .expanded .input-container {
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Foodie Chat</title>
+
+  <!-- Botpress -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"></script>
+
+  <!-- Fonts (Optional but clean) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f5f6fa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding-top: 50px;
+    }
+
+    .chat-wrapper {
+      width: 100%;
+      max-width: 700px;
+      height: 80vh;
+      border: 1px solid #333;
+      border-radius: 12px;
+      overflow: hidden;
+      background-color: #fff;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    #botpress-webchat iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -220px;
+      width: 200px;
+      height: 100%;
+      background-color: #333;
+      padding-top: 60px;
+      transition: left 0.3s ease;
+      z-index: 999;
+    }
+
+    .sidebar.active {
+      left: 0;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 15px 20px;
+      color: #fff;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
+
+    .sidebar a:hover {
+      background-color: #444;
+    }
+
+    /* Toggle Button */
+    .toggle-btn {
+      position: fixed;
+      top: 15px;
+      left: 15px;
+      font-size: 24px;
+      background: #333;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      z-index: 1000;
+    }
+
+    .toggle-btn:focus {
+      outline: 2px solid white;
+    }
+
+    @media screen and (max-width: 600px) {
+      .chat-wrapper {
+        height: 70vh;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <div class="expanded" id="chatWrapper">
-        <button class="expand-button" onclick="expandChat()">Expand</button>
-        <div class="chat-container">
-            <div class="chat-box" id="chatBox">
-            </div>
-            <div class="input-container">
-                <input type="text" id="userInput" placeholder="Type a message...">
-                <button onclick="sendMessage()">Send</button>
-            </div>
-        </div>
-    </div>
 
-     <!-- Sidebar -->
-     <div class="sidebar" id="sidebar">
-        <a href="#">🏠 Home</a>
-        <a href="#">🍽 Food</a>
-        <a href="#">📜 History</a>
-        <a href="#">📞 Contact</a>
-    </div>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <a href="#">🏠 Home</a>
+    <a href="#">🍽 Food</a>
+    <a href="#">📜 History</a>
+    <a href="#">📞 Contact</a>
+  </div>
 
-    <!-- Toggle Button -->
-    <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+  <!-- Toggle Sidebar Button -->
+  <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
 
-    <script>
-        function sendMessage() {
-            const userInput = document.getElementById("user-input").value.trim();
-            const chatBox = document.getElementById("chatBox");
-            const chatWrapper = document.getElementById("chatWrapper");
+  <!-- Chatbot -->
+  <div class="chat-wrapper">
+    <div id="botpress-webchat"></div>
+  </div>
 
-            if (userInput) {
-                appendMessage(userInput, "user");
-                document.getElementById("user-input").value = '';
 
-                // Expand chat area automatically when a message is sent
-                chatWrapper.classList.add("expanded");
+<script>
+  function toggleSidebar() {
+    document.getElementById("sidebar").classList.toggle("active");
+  }
 
-                // Simulate bot response
-                setTimeout(() => {
-                    appendMessage("I'm just a bot, but you said: " + userInput, "bot");
-                }, 1000);
-            }
-        }
+  window.botpressWebChat.init({
+    botId: "klempu5f",
+    clientId: "klempu5f",
+    hostUrl: "https://cdn.botpress.cloud/webchat/v2.2",
+    messagingUrl: "https://messaging.botpress.cloud",
+    container: "#botpress-webchat",
+    composerPlaceholder: "Send a message...",
+    hideWidget: true, // Important: disables the floating bubble
+    showPoweredBy: false,
+    enableTranscriptDownload: false,
+    layoutWidth: "100%",
+    theme: {
+      colors: {
+        primary: "#333",
+        secondary: "#f5f6fa",
+        textPrimary: "#ffffff",
+        textSecondary: "#333"
+      }
+    },
+    botConversationDescription: "Ask me anything food-related!",
+    enableConversationDeletion: true,
+    enableReset: true,
+    onLoad: function () {
+      setTimeout(() => {
+        window.botpressWebChat.sendEvent({
+          type: "proactive-trigger",
+          channel: "web",
+          payload: {
+            type: "quick_replies",
+            text: "Here are some tasty ideas to try:",
+            replies: [
+              { title: "What’s for dinner?", payload: "What’s for dinner?" },
+              { title: "Give me a healthy snack idea", payload: "Give me a healthy snack idea" },
+              { title: "What can I cook with eggs and rice?", payload: "What can I cook with eggs and rice?" }
+            ]
+          }
+        });
+      }, 1000); // wait for iframe to load
+    }
+  });
+</script>
 
-        function appendMessage(message, sender) {
-            const chatBox = document.getElementById("chatBox");
-            const messageDiv = document.createElement("div");
 
-            messageDiv.classList.add("message", sender === "user" ? "user-message" : "bot-message");
-            messageDiv.textContent = message;
-
-            chatBox.appendChild(messageDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            // Check if chat should shrink or expand
-            checkChatSize();
-        }
-
-        function checkChatSize() {
-            const chatWrapper = document.getElementById("chatWrapper");
-            const chatBox = document.getElementById("chatBox");
-
-            // Shrink the chat if there are no messages
-            if (chatBox.children.length === 0) {
-                chatWrapper.classList.remove("expanded");
-            }
-        }
-
-        function sendQuickQuestion(question) {
-            document.getElementById('user-input').value = question;
-            sendMessage();
-        }
-    </script>
-    
-    <script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"></script>
-<script src="https://files.bpcontent.cloud/2025/03/21/15/20250321151303-KLEMPU5F.js"></script>
-    
+  </script>
 </body>
 </html>
-
