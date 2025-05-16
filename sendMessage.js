@@ -10,7 +10,7 @@ fetch("https://messaging.botpress.cloud/v1/messages", {
   },
   body: JSON.stringify({
     botId: "be20d1c7-fa5b-4fe4-9eeb-649a325f6b96", // Just the UUID
-    clientId: "your-client-id-here", // Get from Botpress Cloud dashboard
+    clientId: "8b8e428c-ce1f-4989-a4b8-511857720649", // Get from Botpress Cloud dashboard
     payload: {
       type: "text",
       text: userMessage,
